@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "tsc && node ./dist/test.js"
+    "test": "tsc && node ./dist/test.js",
+    "clear": "rm -rf ./dist",
+    "rebuild": "npm run clear && tsc",
+    "start": "npm run rebuild && node ./dist/index.js"
   },
   "repository": {
     "type": "git",
