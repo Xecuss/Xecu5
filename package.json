@@ -1,0 +1,27 @@
+{
+  "name": "xecu5",
+  "version": "5.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xecuss/Xecu5.git"
+  },
+  "author": "Xs!",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Xecuss/Xecu5/issues"
+  },
+  "homepage": "https://github.com/Xecuss/Xecu5#readme",
+  "devDependencies": {
+    "@types/node": "^14.0.13",
+    "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "ws-bot-manager": "^0.1.0"
+  }
+}
