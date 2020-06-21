@@ -24,7 +24,7 @@ class EchoCaller extends EventEmitter{
 }
 
 export default class CQDriver implements IBotDriver{
-    public readonly id: string = 'coolq';
+    public readonly id: string = 'cqhttp';
 
     private caller = new EchoCaller();
 
@@ -39,19 +39,23 @@ export default class CQDriver implements IBotDriver{
     }
 
     checkResponse(data: any): boolean {
-        throw new Error("Method not implemented.");
+        if(data.echo !== undefined) return true;
+        return false;
     }
 
     procResponse(data: any) {
         throw new Error("Method not implemented.");
     }
 
-    procEvent(data: any, botId: number): Promise<IBotEvent> {
-        throw new Error("Method not implemented.");
+    async procEvent(data: any, botId: number): Promise<IBotEvent> {
+        if(data.post_type=='meta_event' && data.meta_event_type=='heartbeat'){
+            console.log(`${new Date().toLocaleString()} 心跳包...`);
+        }
+        return {} as any;
     }
 
-    getGroupList(ws: WebSocket): Promise<string[]> {
-        throw new Error("Method not implemented.");
+    async getGroupList(ws: WebSocket): Promise<string[]> {
+        return [];
     }
 
     async callAPI(){}
