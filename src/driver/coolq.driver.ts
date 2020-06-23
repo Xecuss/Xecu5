@@ -1,8 +1,9 @@
 import { IBotDriver } from 'ws-bot-manager/dist/interface/IBotDriver';
-import { IBotEvent } from 'ws-bot-manager/dist/interface/IBotEvent';
+import { IBotEvent, IGroupMsgEvent } from 'ws-bot-manager/dist/interface/IBotEvent';
 import { IncomingMessage } from 'http';
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
+import { IBotGroupMessage, IStructMessageItem } from 'ws-bot-manager/dist/interface/IBotMessage';
 
 class EchoCaller extends EventEmitter{
     private static echo: number = 1;
@@ -21,6 +22,21 @@ class EchoCaller extends EventEmitter{
             this.emit(eName, data);
         }
     }
+}
+
+const transCQHttpType: { [T: string]: (item: any) => IStructMessageItem} = {
+    'text': (item: any) => { return {
+        type: 'text',
+        text: item.data.text
+    };},
+    'image': (item: any) => {return {
+        type: 'image',
+        url: item.data.file
+    };},
+    'face': (item: any) => {return {
+        type: 'emoji',
+        id: item.data.id
+    };}
 }
 
 export default class CQDriver implements IBotDriver{
@@ -47,15 +63,55 @@ export default class CQDriver implements IBotDriver{
         throw new Error("Method not implemented.");
     }
 
-    async procEvent(data: any, botId: number): Promise<IBotEvent> {
-        if(data.post_type=='meta_event' && data.meta_event_type=='heartbeat'){
-            console.log(`${new Date().toLocaleString()} 心跳包...`);
+    async procEvent(data: any, botId: number): Promise<IBotEvent | null> {
+        if(data.post_type === 'meta_event' && data.meta_event_type === 'heartbeat'){
+            return null;
         }
-        return {} as any;
+        else if(data.post_type === 'message' && data.message_type === 'group'){
+            return this.procGroupMsg(data, botId);
+        }
+        return null;
+    }
+
+    procGroupMsg(data: any, botId: number): IBotEvent{
+        let msg = data.message;
+        let result: IGroupMsgEvent = {
+            type: 'group-message',
+            botId,
+            token: '',
+            data: {
+                group_id: data.group_id.toString(),
+                type: 'message',
+                sender: {
+                    user_id: data.sender.user_id.toString(),
+                    user_name: data.sender.card || data.sender.nickname,
+                    role: data.sender.role || 'normal'
+                },
+                message_id: data.message_id.toString(),
+                message: this.transCQHttpMsg(msg)
+            }
+        };
+        return result;
+    }
+
+    transCQHttpMsg(msg: any): Array<IStructMessageItem>{
+        let res: Array<IStructMessageItem> = [];
+        if(typeof msg === 'string'){
+            //to do
+        }
+        else{
+            for(let item of msg){
+                let transFunc = transCQHttpType[item.type];
+                if(transFunc !== undefined){
+                    res.push(transFunc(item));
+                }
+            }
+        }
+        return res;
     }
 
     async getGroupList(ws: WebSocket): Promise<string[]> {
-        return [];
+        return ['938949705'];
     }
 
     async callAPI(){}

@@ -1,10 +1,12 @@
 import Manager from 'ws-bot-manager';
 import IBotConfig, { Console } from '../interface/config.interface';
 
+import GroupMsgHandler from '../EventHandler/groupMsg.handler';
+
 export default class Listener{
     private manager: Manager;
 
-    private logger: Console;
+    public logger: Console;
 
     private port: number;
 
@@ -12,6 +14,7 @@ export default class Listener{
         this.manager = new Manager(config.managerConfig);
         this.logger = config.logger;
         this.port = config.managerConfig.port;
+        this.manager.groupMsgEmitter.on(GroupMsgHandler.bind(this));
     }
 
     listen(): void{
