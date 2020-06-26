@@ -3,8 +3,8 @@ import { IBotEvent, IGroupMsgEvent } from 'ws-bot-manager/dist/interface/IBotEve
 import { IncomingMessage } from 'http';
 import WebSocket from 'ws';
 import EchoCaller from './lib/EchoCaller';
-import transCQHttpType from './lib/CQHttp2StructMessage';
-import { IStructMessageItem } from 'ws-bot-manager/dist/interface/IBotMessage';
+import { CQHttpMsg2StructMsg, StructMsg2CQHttpMsg } from './lib/CQHttp2StructMessage';
+import { IStructMessageItem, ISendMessageResponse } from 'ws-bot-manager/dist/interface/IBotMessage';
 
 export default class CQDriver implements IBotDriver{
     public readonly id: string = 'cqhttp';
@@ -55,31 +55,15 @@ export default class CQDriver implements IBotDriver{
                     role: data.sender.role || 'normal'
                 },
                 message_id: data.message_id.toString(),
-                message: this.transCQHttpMsg(msg)
+                message: CQHttpMsg2StructMsg(msg)
             }
         };
         return result;
     }
 
-    transCQHttpMsg(msg: any): Array<IStructMessageItem>{
-        let res: Array<IStructMessageItem> = [];
-        if(typeof msg === 'string'){
-            //to do
-        }
-        else{
-            for(let item of msg){
-                let transFunc = transCQHttpType[item.type];
-                if(transFunc !== undefined){
-                    res.push(transFunc(item));
-                }
-            }
-        }
-        return res;
-    }
-
     public async getGroupList(ws: WebSocket): Promise<string[]> {
         let rawRes = await this.callAPI(ws, {
-            "action":"get_group_list"
+            action: "get_group_list"
         });
         let res: Array<string> = [];
         if(rawRes.retcode === 0){
@@ -93,5 +77,39 @@ export default class CQDriver implements IBotDriver{
         return new Promise((res) => {
             this.caller.once(eventId, res);
         });
+    }
+
+    public async sendGroupMsg(ws: WebSocket, target: string, msg: IStructMessageItem[]): Promise<ISendMessageResponse> {
+        let rawRes = await this.callAPI(ws, {
+            action: 'send_group_msg',
+            params: {
+                message: StructMsg2CQHttpMsg(msg),
+                group_id: target
+            }
+        });
+        if(rawRes.retcode === 0){
+            return {
+                success: true,
+                message_id: rawRes.data.message_id.toString()
+            }
+        }
+        return { success: false };
+    }
+    
+    public async sendPrivateMsg(ws: WebSocket, target: string, msg: IStructMessageItem[]): Promise<ISendMessageResponse> {
+        let rawRes = await this.callAPI(ws, {
+            action: 'send_private_msg',
+            params: {
+                message: StructMsg2CQHttpMsg(msg),
+                user_id: target
+            }
+        });
+        if(rawRes.retcode === 0){
+            return {
+                success: true,
+                message_id: rawRes.data.message_id.toString()
+            }
+        }
+        return { success: false };
     }
 }

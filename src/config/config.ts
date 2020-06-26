@@ -10,7 +10,7 @@ const Config: IBotConfig = {
         drivers: [path.resolve('./dist/driver/coolq.driver/index.js')],
         verify: () => true,
         logger: logger,
-        getGroup: () => ''
+        getGroup: () => 'default'
     },
     logger
 }

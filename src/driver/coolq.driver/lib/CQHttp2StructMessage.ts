@@ -15,4 +15,55 @@ const transCQHttpType: { [T: string]: (item: any) => IStructMessageItem} = {
     };}
 }
 
-export default transCQHttpType;
+export function CQHttpMsg2StructMsg(msg: any): Array<IStructMessageItem>{
+    let res: Array<IStructMessageItem> = [];
+    if(typeof msg === 'string'){
+        //to do
+    }
+    else{
+        for(let item of msg){
+            let transFunc = transCQHttpType[item.type];
+            if(transFunc !== undefined){
+                res.push(transFunc(item));
+            }
+        }
+    }
+    return res;
+}
+
+export function StructMsg2CQHttpMsg(msg: Array<IStructMessageItem>): any{
+    let res: Array<any> = [];
+    for(let item of msg){
+        switch(item.type){
+            case 'text': {
+                res.push({
+                    type: 'text',
+                    data: {
+                        text: item.text
+                    }
+                });
+                break;
+            }
+            case 'image': {
+                res.push({
+                    type: 'image',
+                    data: {
+                        file: item.url
+                    }
+                });
+                break;
+            }
+            case 'emoji': {
+                res.push({
+                    type: 'face',
+                    data: {
+                        id: item.id
+                    }
+                });
+                break;
+            }
+        }
+    }
+
+    return res;
+}

@@ -4,7 +4,7 @@ import IBotConfig, { Console } from '../interface/config.interface';
 import GroupMsgHandler from '../EventHandler/groupMsg.handler';
 
 export default class Listener{
-    private manager: Manager;
+    public manager: Manager;
 
     public logger: Console;
 
