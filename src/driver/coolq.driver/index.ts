@@ -2,42 +2,9 @@ import { IBotDriver } from 'ws-bot-manager/dist/interface/IBotDriver';
 import { IBotEvent, IGroupMsgEvent } from 'ws-bot-manager/dist/interface/IBotEvent';
 import { IncomingMessage } from 'http';
 import WebSocket from 'ws';
-import { EventEmitter } from 'events';
-import { IBotGroupMessage, IStructMessageItem } from 'ws-bot-manager/dist/interface/IBotMessage';
-
-class EchoCaller extends EventEmitter{
-    private static echo: number = 1;
-
-    call(ws: WebSocket, data: any): string{
-        let echoId = EchoCaller.echo++,
-            eName = `e${echoId}`;
-        data.echo = echoId;
-        ws.send(JSON.stringify(data));
-        return eName;
-    }
-
-    check(data: any): void{
-        if(data?.echo){
-            let eName = `e${data.echo}`;
-            this.emit(eName, data);
-        }
-    }
-}
-
-const transCQHttpType: { [T: string]: (item: any) => IStructMessageItem} = {
-    'text': (item: any) => { return {
-        type: 'text',
-        text: item.data.text
-    };},
-    'image': (item: any) => {return {
-        type: 'image',
-        url: item.data.file
-    };},
-    'face': (item: any) => {return {
-        type: 'emoji',
-        id: item.data.id
-    };}
-}
+import EchoCaller from './lib/EchoCaller';
+import transCQHttpType from './lib/CQHttp2StructMessage';
+import { IStructMessageItem } from 'ws-bot-manager/dist/interface/IBotMessage';
 
 export default class CQDriver implements IBotDriver{
     public readonly id: string = 'cqhttp';
@@ -60,7 +27,7 @@ export default class CQDriver implements IBotDriver{
     }
 
     procResponse(data: any) {
-        throw new Error("Method not implemented.");
+        this.caller.check(data);
     }
 
     async procEvent(data: any, botId: number): Promise<IBotEvent | null> {
@@ -110,9 +77,21 @@ export default class CQDriver implements IBotDriver{
         return res;
     }
 
-    async getGroupList(ws: WebSocket): Promise<string[]> {
-        return ['938949705'];
+    public async getGroupList(ws: WebSocket): Promise<string[]> {
+        let rawRes = await this.callAPI(ws, {
+            "action":"get_group_list"
+        });
+        let res: Array<string> = [];
+        if(rawRes.retcode === 0){
+            res = rawRes.data.map((group_list: any) => group_list.group_id.toString());
+        }
+        return res;
     }
 
-    async callAPI(){}
+    public callAPI(ws: WebSocket, args: any): Promise<any>{
+        const eventId = this.caller.call(ws, args);
+        return new Promise((res) => {
+            this.caller.once(eventId, res);
+        });
+    }
 }

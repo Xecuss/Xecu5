@@ -7,7 +7,7 @@ const logger = new NamedHistoryLogger('Bot', 20);
 const Config: IBotConfig = {
     managerConfig: {
         port: 9000,
-        drivers: [path.resolve('./dist/driver/coolq.driver.js')],
+        drivers: [path.resolve('./dist/driver/coolq.driver/index.js')],
         verify: () => true,
         logger: logger,
         getGroup: () => ''
