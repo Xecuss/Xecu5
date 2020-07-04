@@ -1,20 +1,38 @@
 import Manager from 'ws-bot-manager';
 import IBotConfig, { Console } from '../interface/config.interface';
 
-import GroupMsgHandler from '../EventHandler/groupMsg.handler';
+import { GroupMsgMidManager } from '../MidManager/GroupMsgMidManager';
 
-export default class Listener{
+import { TransMsgToStringMid, TriggerHolderMid } from '../middlewares/groupMsg.handler';
+
+export class Application{
     public manager: Manager;
 
     public logger: Console;
 
     private port: number;
 
+    private groupMsgManager: GroupMsgMidManager;
+
     constructor(config: IBotConfig){
         this.manager = new Manager(config.managerConfig);
         this.logger = config.logger;
         this.port = config.managerConfig.port;
-        this.manager.groupMsgEmitter.on(GroupMsgHandler.bind(this));
+
+        this.groupMsgManager = new GroupMsgMidManager(this.manager);
+        
+        this.bindEvent();
+
+        this.setMiddleware();
+    }
+
+    private bindEvent(){
+        this.manager.groupMsgEmitter.on(this.groupMsgManager.mid.bind(this.groupMsgManager));
+    }
+
+    private setMiddleware(){
+        this.groupMsgManager.use(TransMsgToStringMid);
+        this.groupMsgManager.use(TriggerHolderMid);
     }
 
     listen(): void{

@@ -1,6 +1,6 @@
 import config from './config/config';
-import Platform from './lib/main';
+import { Application } from './lib/main';
 
-let p = new Platform(config);
+let app = new Application(config);
 
-p.listen();
+app.listen();
