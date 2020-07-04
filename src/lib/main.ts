@@ -3,7 +3,7 @@ import IBotConfig, { Console } from '../interface/config.interface';
 
 import { GroupMsgMidManager } from '../MidManager/GroupMsgMidManager';
 
-import { TransMsgToStringMid, TriggerHolderMid } from '../middlewares/groupMsg.handler';
+import { BasicProcMid, TriggerHolderMid, ExampleMid } from '../middlewares/groupMsg.middleware';
 
 export class Application{
     public manager: Manager;
@@ -31,8 +31,9 @@ export class Application{
     }
 
     private setMiddleware(){
-        this.groupMsgManager.use(TransMsgToStringMid);
+        this.groupMsgManager.use(BasicProcMid);
         this.groupMsgManager.use(TriggerHolderMid);
+        this.groupMsgManager.use(ExampleMid);
     }
 
     listen(): void{

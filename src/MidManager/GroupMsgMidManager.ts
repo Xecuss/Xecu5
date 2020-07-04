@@ -14,8 +14,8 @@ export class GroupMsgMidManager extends MidNight<IGroupMsgEvent, IBotGroupMsgEve
     transEventToContext(e: IGroupMsgEvent): IBotGroupMsgEventContext {
         return {
             rawEvent: e,
-            msg: '',
-            reply: '',
+            msgText: '',
+            replyText: '',
             manager: this.manager
         }
     }

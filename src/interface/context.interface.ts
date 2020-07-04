@@ -7,7 +7,7 @@ export interface IBotEventBaseContext{
 
 export interface IBotGroupMsgEventContext extends IBotEventBaseContext{
     rawEvent: IGroupMsgEvent;
-    msg: string;
-    reply: string;
+    msgText: string;
+    replyText: string;
     manager: BotManager;
 }
