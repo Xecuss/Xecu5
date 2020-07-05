@@ -1,14 +1,14 @@
 import { IBotGroupMsgEventContext } from '../interface/context.interface';
 import { MidNight } from '../lib/Midnight';
-import BotManager from "ws-bot-manager";
 import { IGroupMsgEvent } from 'ws-bot-manager/dist/interface/IBotEvent';
+import { Bot } from '../lib/Bot';
 
 export class GroupMsgMidManager extends MidNight<IGroupMsgEvent, IBotGroupMsgEventContext>{
 
-    private manager: BotManager;
-    constructor(m: BotManager){
+    private bot: Bot;
+    constructor(b: Bot){
         super();
-        this.manager = m;
+        this.bot = b;
     }
 
     transEventToContext(e: IGroupMsgEvent): IBotGroupMsgEventContext {
@@ -16,7 +16,7 @@ export class GroupMsgMidManager extends MidNight<IGroupMsgEvent, IBotGroupMsgEve
             rawEvent: e,
             msgText: '',
             replyText: '',
-            manager: this.manager
+            bot: this.bot
         }
     }
-}
+} 

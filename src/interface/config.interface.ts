@@ -3,7 +3,7 @@ import { IBotManagerConfig } from "ws-bot-manager/dist/interface/IBotManagerConf
 export interface Console{
     log(s: string): void;
     warn(s: string): void;
-    log(s: string): void;
+    error(s: string): void;
 }
 
 export default interface IBotConfig{

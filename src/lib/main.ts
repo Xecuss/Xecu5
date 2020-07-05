@@ -1,9 +1,7 @@
 import Manager from 'ws-bot-manager';
 import IBotConfig, { Console } from '../interface/config.interface';
-
-import { GroupMsgMidManager } from '../MidManager/GroupMsgMidManager';
-
-import { BasicProcMid, TriggerHolderMid, ExampleMid } from '../middlewares/groupMsg.middleware';
+import { Bot } from './Bot';
+import { IBotInnerEvent } from 'ws-bot-manager/dist/interface/IBotInnerEvent';
 
 export class Application{
     public manager: Manager;
@@ -12,28 +10,34 @@ export class Application{
 
     private port: number;
 
-    private groupMsgManager: GroupMsgMidManager;
+    private botMap: Map<string, Bot>;
 
     constructor(config: IBotConfig){
         this.manager = new Manager(config.managerConfig);
         this.logger = config.logger;
         this.port = config.managerConfig.port;
-
-        this.groupMsgManager = new GroupMsgMidManager(this.manager);
+        this.botMap = new Map();
         
         this.bindEvent();
+    }
 
-        this.setMiddleware();
+    private connectHandle(e: IBotInnerEvent){
+        if(e.type === 'bot-connect'){
+            let mBot = this.manager.getBot(e.token);
+
+            if(mBot === undefined){
+                this.logger.error(`connectHandle: 连接时无法找到token为 ${e.token} bot！`);
+                return;
+            }
+
+            let botInstance = new Bot(e.token, mBot);
+
+            this.botMap.set(e.token, botInstance);
+        }
     }
 
     private bindEvent(){
-        this.manager.groupMsgEmitter.on(this.groupMsgManager.mid.bind(this.groupMsgManager));
-    }
-
-    private setMiddleware(){
-        this.groupMsgManager.use(BasicProcMid);
-        this.groupMsgManager.use(TriggerHolderMid);
-        this.groupMsgManager.use(ExampleMid);
+        this.manager.on(this.connectHandle.bind(this));
     }
 
     listen(): void{
