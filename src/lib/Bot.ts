@@ -1,9 +1,10 @@
-import { IGroupMsgEvent } from "ws-bot-manager/dist/interface/IBotEvent";
 import { GroupMsgMidManager } from '../MidManager/GroupMsgMidManager';
 import LogicBot from "ws-bot-manager/dist/lib/LogicBot";
 
 import { BasicProcMid, TriggerHolderMid, ExampleMid } from '../middlewares/groupMsg.middleware';
 import { IStructMessageItem } from "ws-bot-manager/dist/interface/IBotMessage";
+
+import { IBotConfig } from '../interface/bot.interface';
 
 /**
  * 目前还没有完整的结构，所以暂时先把一部分“消息函数”写在这里
@@ -32,6 +33,8 @@ const at: messageFunc = (id: string): IStructMessageItem[] => {
 export class Bot{
     public readonly token: string;
 
+    public readonly defaultTrigger: string;
+
     private groupMsgManager: GroupMsgMidManager;
 
     private managerBot: LogicBot;
@@ -46,8 +49,10 @@ export class Bot{
         return this.managerBot.sendPrivateMsg.bind(this.managerBot);
     }
 
-    constructor(token: string, mBot: LogicBot){
+    constructor(token: string, mBot: LogicBot, conf: IBotConfig){
         this.token = token;
+
+        this.defaultTrigger = conf.trigger;
 
         this.managerBot = mBot;
 
