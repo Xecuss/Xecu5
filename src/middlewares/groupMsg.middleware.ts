@@ -8,6 +8,8 @@ export let TriggerHolderMid: MiddleWare<IBotGroupMsgEventContext>;
 
 export let ExampleMid: MiddleWare<IBotGroupMsgEventContext>;
 
+export let LineProcMid: MiddleWare<IBotGroupMsgEventContext>;
+
 function transStructMsg(msg: IStructMessageItem[]): string{
     let res: string = '';
     for(let item of msg){
@@ -72,7 +74,7 @@ BasicProcMid = async (ctx: IBotGroupMsgEventContext, next) => {
     ctx.msgText = transStructMsg(msg);
     ctx.replyText += '1 - BasicProc中间件将结构化消息变成纯文本\n';
 
-    next();
+    await next();
 
     if(ctx.replyText === '') return;
 
@@ -93,6 +95,16 @@ TriggerHolderMid = async (ctx: IBotGroupMsgEventContext, next) => {
 ExampleMid = async (ctx: IBotGroupMsgEventContext, next) => {
     ctx.replyText += '3 - 示例中间件仅当触发时调用\n';
     ctx.replyText += `消息文本：${ctx.msgText}\n`;
+
+    await next();
+}
+
+LineProcMid = async (ctx: IBotGroupMsgEventContext, next) => {
+    let { bot } = ctx;
+    let beforeList = bot.beforeProc;
+    for(let fn of beforeList){
+        await fn(ctx);
+    }
 
     await next();
 }

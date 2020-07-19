@@ -30,7 +30,9 @@ export class Application{
                 return;
             }
 
-            let botInstance = new Bot(e.token, mBot);
+            let botInstance = new Bot(e.token, mBot, {
+                trigger: 'Sucex'
+            });
 
             this.botMap.set(e.token, botInstance);
         }

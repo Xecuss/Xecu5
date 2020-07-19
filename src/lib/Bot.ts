@@ -1,16 +1,25 @@
+import 'reflect-metadata';
 import { GroupMsgMidManager } from '../MidManager/GroupMsgMidManager';
 import LogicBot from "ws-bot-manager/dist/lib/LogicBot";
 
-import { BasicProcMid, TriggerHolderMid, ExampleMid } from '../middlewares/groupMsg.middleware';
+import { BasicProcMid, TriggerHolderMid, LineProcMid } from '../middlewares/groupMsg.middleware';
 import { IStructMessageItem } from "ws-bot-manager/dist/interface/IBotMessage";
 
 import { IBotConfig } from '../interface/bot.interface';
+import { IBotModule } from '../interface/module.interface';
+import { IBotGroupMsgEventContext } from '../interface/context.interface';
+
+//目前没有完整的结构，先把模块在这里导入
+import TestModule from '../module/testModule';
+import { MethodType } from './decorator';
+
+type messageFunc = (str: string) => IStructMessageItem[];
+
+type lineProcFunc = (ctx: IBotGroupMsgEventContext) => any;
 
 /**
  * 目前还没有完整的结构，所以暂时先把一部分“消息函数”写在这里
  */
-type messageFunc = (str: string) => IStructMessageItem[];
-
 const image: messageFunc = (url: string): IStructMessageItem[] => {
     return [{
         type: 'image',
@@ -41,6 +50,8 @@ export class Bot{
 
     private msgFuncMap: {[K: string]: messageFunc };
 
+    public beforeProc: Array<lineProcFunc>;
+
     //将LogicBot上的方法代理到Bot上方便访问
     get sendGroupMsg(){
         return this.managerBot.sendGroupMsg.bind(this.managerBot);
@@ -60,6 +71,8 @@ export class Bot{
 
         this.msgFuncMap = Object.create(null);
 
+        this.beforeProc = [];
+
         this.bindEvent();
 
         this.setMiddleware();
@@ -68,12 +81,15 @@ export class Bot{
         this.mountMessageFunction('image', image);
         this.mountMessageFunction('emoji', emoji);
         this.mountMessageFunction('at', at);
+
+        //临时用模块
+        this.mountModule(new TestModule());
     }
 
     private setMiddleware(){
         this.groupMsgManager.use(BasicProcMid);
         this.groupMsgManager.use(TriggerHolderMid);
-        this.groupMsgManager.use(ExampleMid);
+        this.groupMsgManager.use(LineProcMid);
     }
 
     public mountMessageFunction(id: string, fn: messageFunc){
@@ -94,5 +110,27 @@ export class Bot{
     private bindEvent(){
         let mBot = this.managerBot;
         mBot.groupMsgEmitter.on(this.groupMsgManager.mid.bind(this.groupMsgManager));
+    }
+
+    public mountModule(module: IBotModule){
+        let p = Object.getPrototypeOf(module);
+        let keys = Object.getOwnPropertyNames(p);
+
+        for(let k of keys){
+            if(typeof p[k] !== 'function' || k === 'constructor') continue;
+
+            let funcType = Reflect.getMetadata('XB:Method', p, k);
+                
+            switch(funcType){
+                case MethodType.BeforeProc: {
+                    console.log(`mount: ${k}`);
+                    this.beforeProc.push(p[k].bind(module));
+                    break;
+                }
+                default: {
+                    console.log(`${k} 不属于可执行method`);
+                }
+            }
+        }
     }
 }
