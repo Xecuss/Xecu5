@@ -52,6 +52,8 @@ export class Bot{
 
     public beforeProc: Array<lineProcFunc>;
 
+    public afterProc: Array<lineProcFunc>;
+
     //将LogicBot上的方法代理到Bot上方便访问
     get sendGroupMsg(){
         return this.managerBot.sendGroupMsg.bind(this.managerBot);
@@ -72,6 +74,7 @@ export class Bot{
         this.msgFuncMap = Object.create(null);
 
         this.beforeProc = [];
+        this.afterProc = [];
 
         this.bindEvent();
 
@@ -88,8 +91,8 @@ export class Bot{
 
     private setMiddleware(){
         this.groupMsgManager.use(BasicProcMid);
-        this.groupMsgManager.use(TriggerHolderMid);
         this.groupMsgManager.use(LineProcMid);
+        this.groupMsgManager.use(TriggerHolderMid);
     }
 
     public mountMessageFunction(id: string, fn: messageFunc){
@@ -125,6 +128,11 @@ export class Bot{
                 case MethodType.BeforeProc: {
                     console.log(`mount: ${k}`);
                     this.beforeProc.push(p[k].bind(module));
+                    break;
+                }
+                case MethodType.AfterProc: {
+                    console.log(`mount: ${k}`);
+                    this.afterProc.push(p[k].bind(module));
                     break;
                 }
                 default: {

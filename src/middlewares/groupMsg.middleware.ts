@@ -107,4 +107,9 @@ LineProcMid = async (ctx: IBotGroupMsgEventContext, next) => {
     }
 
     await next();
+
+    let afterList = bot.afterProc;
+    for(let fn of afterList){
+        await fn(ctx);
+    }
 }

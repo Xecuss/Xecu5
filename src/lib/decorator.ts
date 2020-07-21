@@ -11,3 +11,9 @@ export function Before(): MethodDecorator{
         Reflect.defineMetadata('XB:Method', MethodType.BeforeProc, target, key);
     }
 }
+
+export function After(): MethodDecorator{
+    return (target, key, descriptor) => {
+        Reflect.defineMetadata('XB:Method', MethodType.AfterProc, target, key);
+    }
+}

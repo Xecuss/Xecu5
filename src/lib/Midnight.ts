@@ -10,7 +10,7 @@ export abstract class MidNight<E, C>{
 
     private createNext(middleware: MiddleWare<C>, oldNext: any, ctx: C): innerMiddle<C>{
         return async () => {
-            middleware(ctx, oldNext);
+            await middleware(ctx, oldNext);
         }
     }
 
