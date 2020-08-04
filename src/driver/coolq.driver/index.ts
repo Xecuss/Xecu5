@@ -2,7 +2,7 @@ import { IBotDriver } from 'ws-bot-manager/dist/interface/IBotDriver';
 import { IBotEvent, IGroupMsgEvent } from 'ws-bot-manager/dist/interface/IBotEvent';
 import { IncomingMessage } from 'http';
 import WebSocket from 'ws';
-import EchoCaller from './lib/EchoCaller';
+import EchoCaller from '../common/EchoCaller';
 import { CQHttpMsg2StructMsg, StructMsg2CQHttpMsg } from './lib/CQHttp2StructMessage';
 import { IStructMessageItem, ISendMessageResponse } from 'ws-bot-manager/dist/interface/IBotMessage';
 

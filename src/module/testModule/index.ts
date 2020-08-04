@@ -17,7 +17,7 @@ export default class TestModule implements IBotModule{
     @After()
     async testAfterMethod(ctx: IBotGroupMsgEventContext){
         ctx.replyText += `After处理，输出模块自身描述：${this.meta.description}\n`;
-        if(ctx.msgText.indexOf('Sucex') === -1){
+        if(ctx.msgText.indexOf('Hiyuki') === -1){
             ctx.replyText = '';
         }
         console.log(ctx.replyText);

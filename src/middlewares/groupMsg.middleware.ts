@@ -83,7 +83,7 @@ BasicProcMid = async (ctx: IBotGroupMsgEventContext, next) => {
 }
 
 TriggerHolderMid = async (ctx: IBotGroupMsgEventContext, next) => {
-    if(ctx.msgText.indexOf('Sucex') !== -1){
+    if(ctx.msgText.indexOf('Hiyuki') !== -1){
         ctx.replyText += `2 - TriggerHolder中间件控制是否触发\n`;
         await next();
     }
