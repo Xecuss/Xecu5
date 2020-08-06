@@ -16,6 +16,7 @@ function transStructMsg(msg: IStructMessageItem[]): string{
         if(item.type === 'text') res += item.text;
         else if(item.type === 'image') res += `[$image(${item.url})$]`;
         else if(item.type === 'emoji') res += `[$emoji(${item.id})$]`;
+        else if(item.type === 'mention') res += `[$at(${item.id})$]`;
     }
     return res;
 }
@@ -84,7 +85,7 @@ BasicProcMid = async (ctx: IBotGroupMsgEventContext, next) => {
 
 TriggerHolderMid = async (ctx: IBotGroupMsgEventContext, next) => {
     if(ctx.msgText.indexOf('Hiyuki') !== -1){
-        ctx.replyText += `2 - TriggerHolder中间件控制是否触发\n`;
+        ctx.replyText += `2 - TriggerHolder中间件控制是否触发，并at用户[$at(${ctx.rawEvent.data.sender.user_id})$]\n`;
         await next();
     }
     else{

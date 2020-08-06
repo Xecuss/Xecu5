@@ -4,6 +4,7 @@ import WebSocket from 'ws';
 import EchoCaller from "../common/EchoCaller";
 import { IGroupMsgEvent, IBotEvent } from "ws-bot-manager/dist/interface/IBotEvent";
 import { IStructMessageItem, ISendMessageResponse } from "ws-bot-manager/dist/interface/IBotMessage";
+import { DWSCMsg2StructMsg, StructMsg2DWSCMsg } from "./lib/msgTrans";
 
 
 export default class DiscordDriver implements IBotDriver{
@@ -61,10 +62,7 @@ export default class DiscordDriver implements IBotDriver{
                     role: 'normal'
                 },
                 message_id: msg.reference?.messageID.toString(),
-                message: [{
-                    type: 'text',
-                    text: msg.content
-                }]
+                message: DWSCMsg2StructMsg(msg)
             }
         };
         return result;
@@ -83,10 +81,8 @@ export default class DiscordDriver implements IBotDriver{
     }
 
     public async sendGroupMsg(ws: WebSocket, target: string, msg: IStructMessageItem[]): Promise<ISendMessageResponse> {
-        let rawMsg: string = '';
-        for(let item of msg){
-            if(item.type === 'text') rawMsg += item.text;
-        }
+        let rawMsg = StructMsg2DWSCMsg(msg);
+
         let rawRes = await this.callAPI(ws, {
             action: 'send-channel-msg',
             params: {
@@ -94,11 +90,13 @@ export default class DiscordDriver implements IBotDriver{
                 channelId: target
             }
         });
+
         if(rawRes.retcode === 0){
             return {
                 success: true
             }
         }
+
         return { success: false };
     }
     
