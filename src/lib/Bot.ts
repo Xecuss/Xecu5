@@ -50,9 +50,12 @@ export class Bot{
 
     private msgFuncMap: {[K: string]: messageFunc };
 
-    public beforeProc: Array<lineProcFunc>;
+    private readonly _moduleList: Array<IBotModule> = [];
 
-    public afterProc: Array<lineProcFunc>;
+    //该变量不能在外部写入，只可以读取，必须通过mountModule来添加模块
+    get moduleList(){
+        return this._moduleList;
+    }
 
     //将LogicBot上的方法代理到Bot上方便访问
     get sendGroupMsg(){
@@ -73,12 +76,7 @@ export class Bot{
 
         this.msgFuncMap = Object.create(null);
 
-        this.beforeProc = [];
-        this.afterProc = [];
-
         this.bindEvent();
-
-        this.setMiddleware();
 
         //临时用的消息函数
         this.mountMessageFunction('image', image);
@@ -87,11 +85,13 @@ export class Bot{
 
         //临时用模块
         this.mountModule(new TestModule());
+
+        this.setMiddleware();
     }
 
     private setMiddleware(){
         this.groupMsgManager.use(BasicProcMid);
-        this.groupMsgManager.use(LineProcMid);
+        this.mountMiddleware(LineProcMid);
         this.groupMsgManager.use(TriggerHolderMid);
     }
 
@@ -116,29 +116,12 @@ export class Bot{
     }
 
     public mountModule(module: IBotModule){
-        let p = Object.getPrototypeOf(module);
-        let keys = Object.getOwnPropertyNames(p);
+        this.moduleList.push(module);
+    }
 
-        for(let k of keys){
-            if(typeof p[k] !== 'function' || k === 'constructor') continue;
-
-            let funcType = Reflect.getMetadata('XB:Method', p, k);
-                
-            switch(funcType){
-                case MethodType.BeforeProc: {
-                    console.log(`mount: ${k}`);
-                    this.beforeProc.push(p[k].bind(module));
-                    break;
-                }
-                case MethodType.AfterProc: {
-                    console.log(`mount: ${k}`);
-                    this.afterProc.push(p[k].bind(module));
-                    break;
-                }
-                default: {
-                    console.log(`${k} 不属于可执行method`);
-                }
-            }
-        }
+    public mountMiddleware(Middleware: any){
+        let midInstance = new Middleware();
+        midInstance.setup(this);
+        this.groupMsgManager.use(midInstance.proc.bind(midInstance));
     }
 }

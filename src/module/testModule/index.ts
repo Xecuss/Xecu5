@@ -11,12 +11,12 @@ export default class TestModule implements IBotModule{
     @Before()
     async testBeforeMethod(ctx: IBotGroupMsgEventContext){
         ctx.msgText = ctx.msgText.replace('Xecus', 'Sucex');
-        ctx.replyText += 'Before处理，将请求中的Xecus换成Sucex\n';
+        ctx.replyText += 'Before处理，本次测试使用了一种新的中间件结构\n';
     }
 
     @After()
     async testAfterMethod(ctx: IBotGroupMsgEventContext){
-        ctx.replyText += `After处理，输出模块自身描述：${this.meta.description}\n`;
+        ctx.replyText += `After处理，理论上可以降低Bot和中间件的耦合\n`;
         if(ctx.msgText.indexOf('Hiyuki') === -1){
             ctx.replyText = '';
         }
