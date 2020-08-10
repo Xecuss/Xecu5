@@ -1,7 +1,7 @@
-import { IBotGroupMsgEventContext } from '../interface/context.interface';
-import { MidNight } from '../lib/Midnight';
+import { IBotGroupMsgEventContext } from '../../interface/context.interface';
+import { MidNight } from '../../lib/Midnight';
 import { IGroupMsgEvent } from 'ws-bot-manager/dist/interface/IBotEvent';
-import { Bot } from '../lib/Bot';
+import { Bot } from '../../lib/Bot';
 
 export class GroupMsgMidManager extends MidNight<IGroupMsgEvent, IBotGroupMsgEventContext>{
 
