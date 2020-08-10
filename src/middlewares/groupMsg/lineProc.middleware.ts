@@ -27,32 +27,8 @@ export class LineProcMid extends MiddlewareBase{
     }
 
     public setup(bot: Bot){
-        let modules = bot.moduleList;
-
-        for(let module of modules){
-            let p = Object.getPrototypeOf(module);
-            let keys = Object.getOwnPropertyNames(p);
-            for(let k of keys){
-                if(typeof p[k] !== 'function' || k === 'constructor') continue;
-    
-                let funcType = Reflect.getMetadata('XB:Method', p, k);
-                    
-                switch(funcType){
-                    case MethodType.BeforeProc: {
-                        console.log(`mount: ${k}`);
-                        this.beforeProc.push(p[k].bind(module));
-                        break;
-                    }
-                    case MethodType.AfterProc: {
-                        console.log(`mount: ${k}`);
-                        this.afterProc.push(p[k].bind(module));
-                        break;
-                    }
-                    default: {
-                        console.log(`${k} 不属于可执行method`);
-                    }
-                }
-            }       
-        }
+        let res = this.getMethodListfromBot(bot, 'XB:Method', [MethodType.BeforeProc, MethodType.AfterProc]);
+        this.beforeProc = res[MethodType.BeforeProc] || [];
+        this.afterProc = res[MethodType.AfterProc] || [];
     }
 }

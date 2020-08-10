@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 
 export enum MethodType {
-    BeforeProc,
-    AfterProc,
-    Trigger
+    BeforeProc = '0',
+    AfterProc = '1',
+    Trigger = '2'
 }
 
 export function Before(): MethodDecorator{

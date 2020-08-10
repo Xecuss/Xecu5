@@ -6,7 +6,7 @@ const logger = new NamedHistoryLogger('Bot', 20);
 
 const Config: IBotConfig = {
     managerConfig: {
-        port: 9000,
+        port: 8888,
         drivers: [
             path.resolve('./dist/driver/coolq.driver'),
             path.resolve('./dist/driver/discord.driver')
