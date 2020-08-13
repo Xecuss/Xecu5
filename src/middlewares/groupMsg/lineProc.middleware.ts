@@ -1,7 +1,7 @@
 import MiddlewareBase from "../common/middlewareBase";
 import { IBotGroupMsgEventContext } from "../../interface/context.interface";
 import { Bot } from "../../lib/Bot";
-import { MethodType } from "../../lib/decorator";
+import { MethodType } from "./decorator";
 
 export class LineProcMid extends MiddlewareBase{
     private beforeProc: any[] = [];

@@ -6,10 +6,9 @@ export class TriggerHolderMid extends MiddlewareBase{
     constructor(){
         super();
     }
-    
+
     public async proc(ctx: IBotGroupMsgEventContext, next: () => Promise<void>): Promise<void> {
         if(ctx.msgText.indexOf('Hiyuki') !== -1){
-            ctx.replyText += `2 - TriggerHolder中间件控制是否触发，并at用户[$at(${ctx.rawEvent.data.sender.user_id})$]\n`;
             await next();
         }
         else{

@@ -1,5 +1,5 @@
 import { meta } from './metainfo';
-import { Before, After } from '../../lib/decorator';
+import { Before, After } from '../../middlewares/groupMsg/decorator';
 import { IBotGroupMsgEventContext } from '../../interface/context.interface';
 import { IBotModule } from '../../interface/module.interface';
 
