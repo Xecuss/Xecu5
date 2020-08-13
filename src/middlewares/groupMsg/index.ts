@@ -4,4 +4,4 @@ export { LineProcMid } from './lineProc.middleware';
 
 export { GroupMsgMidManager } from './GroupMsgMidManager';
 
-export { TriggerHolderMid, ExampleMid } from './Trigger.middleware'
+export { TriggerHolderMid } from './TriggerHolder.middleware'
