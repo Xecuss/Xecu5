@@ -27,7 +27,7 @@ export class LineProcMid extends MiddlewareBase{
     }
 
     public setup(bot: Bot){
-        let res = this.getMethodListfromBot(bot, 'XB:Method', [MethodType.BeforeProc, MethodType.AfterProc]);
+        let res = super.getMethodListfromBot(bot, 'XB:Method', [MethodType.BeforeProc, MethodType.AfterProc]);
         this.beforeProc = res[MethodType.BeforeProc] || [];
         this.afterProc = res[MethodType.AfterProc] || [];
     }
